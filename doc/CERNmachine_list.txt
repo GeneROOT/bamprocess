@@ -1,0 +1,6 @@
+N	Name
+0	oplabig2.cern.ch
+1	olhswep17.cern.ch
+2	olhswep18.cern.ch
+3	olhswep28.cern.ch
+T	olhswep11.cern.ch  -> This is test machine and/or kept for other uses
