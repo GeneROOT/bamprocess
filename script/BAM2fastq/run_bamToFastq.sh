@@ -10,28 +10,28 @@ PATH=/oplashare/data/mfalchi/samtools-1.3.1:/oplashare/data/mfalchi/pigz-2.3.4:$
 
 BAM2Fastq() 
 {
-	#Extracts ID from filename
-	stem=$(basename $1 .bam)
-	
-	#Creates temporary directory for this analysis
-	mkdir -p $WDIR/$stem
+    #Extracts ID from filename
+    stem=$(basename $1 .bam)
+    
+    #Creates temporary directory for this analysis
+    mkdir -p /eos/genome/kinetic/14007a/sorted_BAM/$stem
 
-	#Sorts by name
-	date | awk '{print "Sorting started at " $0}' > $LDIR/BAM2Fastq_${stem}.log
-	$sambamba sort --natural-sort --memory-limit $sambambamem --tmpdir $WDIR/$stem --out $WDIR/$stem.sorted.bam --compression-level $sambambacompression --nthreads $sambambathreads $1  &>> $LDIR/BAM2Fastq_${stem}.log
-	date | awk '{print "Sorting ended at " $0}' >> $LDIR/BAM2Fastq_${stem}.log
+    #Sorts by name
+    date | awk '{print "Sorting started at " $0}' > /eos/genome/kinetic/14007a/logs/BAM2Fastq_${stem}.log
+    /oplashare/data/mfalchi/sambamba_v0.6.5 sort --natural-sort --memory-limit $sambambamem --tmpdir /eos/genome/kinetic/14007a/sorted_BAM/$stem --out /eos/genome/kinetic/14007a/sorted_BAM/$stem.sorted.bam --compression-level $sambambacompression --nthreads $sambambathreads $1  &>> /eos/genome/kinetic/14007a/logs/BAM2Fastq_${stem}.log
+    date | awk '{print "Sorting ended at " $0}' >> /eos/genome/kinetic/14007a/logs/BAM2Fastq_${stem}.log
 
-	#Converts in two piped steps, that is: from BAM to an interleaved fastq
-	#and then from the interleaved file to two files, one for each paired end.
-	date | awk '{print "Conversion started at " $0}' >> $LDIR/BAM2Fastq_${stem}.log
-	$reformat in=$WDIR/$stem.sorted.bam out=stdout.fq primaryonly | $reformat in=stdin.fq out1=$DDIR/$stem.R1.fq.gz out2=$DDIR/$stem.R2.fq.gz interleaved addcolon ow  &>> $LDIR/BAM2Fastq_${stem}.log
-	date | awk '{print "Conversion ended at " $0}' >> $LDIR/BAM2Fastq_${stem}.log
+    #Converts in two piped steps, that is: from BAM to an interleaved fastq
+    #and then from the interleaved file to two files, one for each paired end.
+    date | awk '{print "Conversion started at " $0}' >> /eos/genome/kinetic/14007a/logs/BAM2Fastq_${stem}.log
+    /oplashare/data/mfalchi/bbmap/reformat.sh in=/eos/genome/kinetic/14007a/sorted_BAM/$stem.sorted.bam out=stdout.fq primaryonly | $reformat in=stdin.fq out1=/eos/genome/kinetic/14007a/fastq/$stem.R1.fq.gz out2=/eos/genome/kinetic/14007a/fastq/$stem.R2.fq.gz interleaved addcolon ow  &>> /eos/genome/kinetic/14007a/logs/BAM2Fastq_${stem}.log
+    date | awk '{print "Conversion ended at " $0}' >> /eos/genome/kinetic/14007a/logs/BAM2Fastq_${stem}.log
 
-	#Removing temporary directory
-	rm -rf $WDIR/$stem
+    #Removing temporary directory
+    rm -rf /eos/genome/kinetic/14007a/sorted_BAM/$stem
 
-	#Recording this file as done
-	echo $1 
+    #Recording this file as done
+    echo $1 
 }
 export -f BAM2Fastq
 
@@ -57,23 +57,18 @@ parallel="/oplashare/data/mfalchi/parallel-20161122/src/parallel"
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 njobs=2
-sambambamem="32G"
-sambambathreads=16
-sambambacompression=6
+sambambamem="32G"; export sambambamem
+sambambathreads=16; export sambambathreads
+sambambacompression=6; export sambambacompression 
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Sets file's paths
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-SDIR="/eos/genome/kinetic/14007a/original_BAM"
-WDIR="/eos/genome/kinetic/14007a/sorted_BAM"
-DDIR="/eos/genome/kinetic/14007a/fastq"
-LDIR="/eos/genome/kinetic/14007a/logs"
-
-filelist="$SDIR/allBAM.txt"
-donelist="$SDIR/doneBAM.txt"
-todolist="$SDIR/todoBAM.txt"
-mylist="$SDIR/todoBAM$1.txt"
+filelist="/eos/genome/kinetic/14007a/original_BAM/allBAM.txt"
+donelist="/eos/genome/kinetic/14007a/original_BAM/doneBAM.txt"
+todolist="/eos/genome/kinetic/14007a/original_BAM/todoBAM.txt"
+mylist="/eos/genome/kinetic/14007a/original_BAM/todoBAM$1.txt"
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Selects files to process 
@@ -90,7 +85,8 @@ awk -v machine=$1 -v availablemachines=$availablemachines 'NR%availablemachines 
 # Files are processed 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-$parallel --keep-order --jobs $njobs BAM2Fastq :::: $mylist >> $donelist
+/oplashare/data/mfalchi/parallel-20161122/src/parallel --keep-order --jobs $njobs BAM2Fastq :::: $mylist >> $donelist
+
 
 
 
