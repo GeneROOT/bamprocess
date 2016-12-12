@@ -24,7 +24,7 @@ BAM2Fastq()
     #Converts in two piped steps, that is: from BAM to an interleaved fastq
     #and then from the interleaved file to two files, one for each paired end.
     date | awk '{print "Conversion started at " $0}' >> /eos/genome/kinetic/14007a/logs/BAM2Fastq_${stem}.log
-    /oplashare/data/mfalchi/bbmap/reformat.sh in=/eos/genome/kinetic/14007a/sorted_BAM/$stem.sorted.bam out=stdout.fq primaryonly | $reformat in=stdin.fq out1=/eos/genome/kinetic/14007a/fastq/$stem.R1.fq.gz out2=/eos/genome/kinetic/14007a/fastq/$stem.R2.fq.gz interleaved addcolon ow  &>> /eos/genome/kinetic/14007a/logs/BAM2Fastq_${stem}.log
+    /oplashare/data/mfalchi/bbmap/reformat.sh in=/eos/genome/kinetic/14007a/sorted_BAM/$stem.sorted.bam out=stdout.fq primaryonly | /oplashare/data/mfalchi/bbmap/reformat.sh in=stdin.fq out1=/eos/genome/kinetic/14007a/fastq/$stem.R1.fq.gz out2=/eos/genome/kinetic/14007a/fastq/$stem.R2.fq.gz interleaved addcolon ow  &>> /eos/genome/kinetic/14007a/logs/BAM2Fastq_${stem}.log
     date | awk '{print "Conversion ended at " $0}' >> /eos/genome/kinetic/14007a/logs/BAM2Fastq_${stem}.log
 
     #Removing temporary directory
@@ -43,14 +43,6 @@ export -f BAM2Fastq
 #The $1 paramenter of this script will identify the current machine 
 #(ranging from 0 to availablemachines-1)
 availablemachines=4
-
-#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# Sets commands' path
-#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-sambamba="/oplashare/data/mfalchi/sambamba_v0.6.5"
-reformat="/oplashare/data/mfalchi/bbmap/reformat.sh"
-parallel="/oplashare/data/mfalchi/parallel-20161122/src/parallel"
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Sets commands paramentes
