@@ -3,4 +3,5 @@ N	Name
 1	olhswep18.cern.ch
 2	olhswep28.cern.ch
 3	oplabig2.cern.ch
-T	olhswep11.cern.ch  -> This is test machine and/or kept for other uses
+4	olhswep11.cern.ch  
+5	opladev47.cern.ch -> This is also used as test machine and/or kept for other uses
