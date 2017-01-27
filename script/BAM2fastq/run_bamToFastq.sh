@@ -24,7 +24,7 @@ BAM2Fastq()
     #Converts in two piped steps, that is: from BAM to an interleaved fastq
     #and then from the interleaved file to two files, one for each paired end.
     date | awk '{print "Conversion started at " $0}' >> /eos/genome/local/14007a/logs/BAM2Fastq_${stem}.log
-    /oplashare/data/mfalchi/bbmap/reformat.sh in=/eos/genome/local/14007a/sorted_BAM/$stem.sorted.bam out= primaryonly  /oplashare/data/mfalchi/bbmap/reformat.sh in=stdin.fq out1=/eos/genome/local/14007a/fastq/$stem.R1.fq.gz out2=/eos/genome/local/14007a/fastq/$stem.R2.fq.gz interleaved addcolon ow  &>> /eos/genome/local/14007a/logs/BAM2Fastq_${stem}.log
+    /oplashare/data/mfalchi/bbmap/reformat.sh in=/eos/genome/local/14007a/sorted_BAM/$stem.sorted.bam out=stdout.fq primaryonly | /oplashare/data/mfalchi/bbmap/reformat.sh in=stdin.fq out1=/eos/genome/local/14007a/fastq/$stem.R1.fq.gz out2=/eos/genome/local/14007a/fastq/$stem.R2.fq.gz interleaved addcolon ow  &>> /eos/genome/local/14007a/logs/BAM2Fastq_${stem}.log
     date | awk '{print "Conversion ended at " $0}' >> /eos/genome/local/14007a/logs/BAM2Fastq_${stem}.log
 
     #Removing temporary directory
