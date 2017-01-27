@@ -1,8 +1,16 @@
+#! /bin/bash
+
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Sets PATH
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 PATH=/oplashare/data/mfalchi/samtools-1.3.1:/oplashare/data/mfalchi/pigz-2.3.4:$PATH
+
+# Paths
+export eos="/eos/genome/local/14007a"
+export origbam="$eos/original_BAM"
+export sortbam="$eos/sorted_BAM"
+export logs="$eos/logs"
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Defines function coding for the conversion pipeline
@@ -10,28 +18,31 @@ PATH=/oplashare/data/mfalchi/samtools-1.3.1:/oplashare/data/mfalchi/pigz-2.3.4:$
 
 BAM2Fastq() 
 {
+    #Clean up file name
+    fname="${1//[$'\t\r\n']}"
+
     #Extracts ID from filename
-    stem=$(basename $1 .bam)
+    stem=$(basename $fname .bam)
     
     #Creates temporary directory for this analysis
-    mkdir -p /eos/genome/local/14007a/sorted_BAM/$stem
+    mkdir -p $sortbam/$stem
 
     #Sorts by name
-    date | awk '{print "Sorting started at " $0}' > /eos/genome/local/14007a/logs/BAM2Fastq_${stem}.log
-    /oplashare/data/mfalchi/sambamba_v0.6.5 sort --natural-sort --memory-limit $sambambamem --tmpdir /eos/genome/local/14007a/sorted_BAM/$stem --out /eos/genome/local/14007a/sorted_BAM/$stem.sorted.bam --compression-level $sambambacompression --nthreads $sambambathreads $1  &>> /eos/genome/local/14007a/logs/BAM2Fastq_${stem}.log
-    date | awk '{print "Sorting ended at " $0}' >> /eos/genome/local/14007a/logs/BAM2Fastq_${stem}.log
+    date | awk '{print "Sorting started at " $0}' > $logs/BAM2Fastq_${stem}.log
+    /oplashare/data/mfalchi/sambamba_v0.6.5 sort --natural-sort --memory-limit $sambambamem --tmpdir $sortbam/$stem --out $sortbam/$stem.sorted.bam --compression-level $sambambacompression --nthreads $sambambathreads $1  &>> $logs/BAM2Fastq_${stem}.log
+    date | awk '{print "Sorting ended at " $0}' >> $logs/BAM2Fastq_${stem}.log
 
     #Converts in two piped steps, that is: from BAM to an interleaved fastq
     #and then from the interleaved file to two files, one for each paired end.
-    date | awk '{print "Conversion started at " $0}' >> /eos/genome/local/14007a/logs/BAM2Fastq_${stem}.log
-    /oplashare/data/mfalchi/bbmap/reformat.sh in=/eos/genome/local/14007a/sorted_BAM/$stem.sorted.bam out=stdout.fq primaryonly | /oplashare/data/mfalchi/bbmap/reformat.sh in=stdin.fq out1=/eos/genome/local/14007a/fastq/$stem.R1.fq.gz out2=/eos/genome/local/14007a/fastq/$stem.R2.fq.gz interleaved addcolon ow  &>> /eos/genome/local/14007a/logs/BAM2Fastq_${stem}.log
-    date | awk '{print "Conversion ended at " $0}' >> /eos/genome/local/14007a/logs/BAM2Fastq_${stem}.log
+    date | awk '{print "Conversion started at " $0}' >> $logs/BAM2Fastq_${stem}.log
+    /oplashare/data/mfalchi/bbmap/reformat.sh in=$sortbam/$stem.sorted.bam out=stdout.fq primaryonly | /oplashare/data/mfalchi/bbmap/reformat.sh in=stdin.fq out1=$eos/fastq/$stem.R1.fq.gz out2=$eos/fastq/$stem.R2.fq.gz interleaved addcolon ow &>> $logs/BAM2Fastq_${stem}.log
+    date | awk '{print "Conversion ended at " $0}' >> $logs/BAM2Fastq_${stem}.log
 
     #Removing temporary directory
-    rm -rf /eos/genome/local/14007a/sorted_BAM/$stem
+    rm -rf $sortbam/$stem
 
     #Recording this file as done
-    echo $1 
+    echo $fname
 }
 export -f BAM2Fastq
 
@@ -42,7 +53,7 @@ export -f BAM2Fastq
 #Number of machine I can use to parallelise my job. 
 #The $1 paramenter of this script will identify the current machine 
 #(ranging from 0 to availablemachines-1)
-availablemachines=6
+availablemachines=4
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Sets commands paramentes
@@ -57,10 +68,10 @@ sambambacompression=6; export sambambacompression
 # Sets file's paths
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-filelist="/eos/genome/local/14007a/original_BAM/allBAM.txt"
-donelist="/eos/genome/local/14007a/original_BAM/doneBAM.txt"
-todolist="/eos/genome/local/14007a/original_BAM/todoBAM.txt"
-mylist="/eos/genome/local/14007a/original_BAM/todoBAM$1.txt"
+filelist="$origbam/allBAM.txt"
+donelist="$origbam/doneBAM.txt"
+todolist="$origbam/todoBAM.txt"
+mylist="$origbam/todoBAM$1.txt"
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Selects files to process 
@@ -78,7 +89,3 @@ awk -v machine=$1 -v availablemachines=$availablemachines 'NR%availablemachines 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 /oplashare/data/mfalchi/parallel-20161122/src/parallel --keep-order --jobs $njobs BAM2Fastq :::: $mylist >> $donelist
-
-
-
-
