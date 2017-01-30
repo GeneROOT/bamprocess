@@ -18,6 +18,9 @@ export logs="$eos/logs"
 
 BAM2Fastq() 
 {
+    # Renew AFS token
+    kinit -R
+
     #Clean up file name
     fname="${1//[$'\t\r\n']}"
 
@@ -28,15 +31,18 @@ BAM2Fastq()
     mkdir -p $sortbam/$stem
 
     #Sorts by name
-    date | awk '{print "Sorting started at " $0}' > $logs/BAM2Fastq_${stem}.log
+    echo "Sorting started at $(date) on $(hostname)" > $logs/BAM2Fastq_${stem}.log
     /oplashare/data/mfalchi/sambamba_v0.6.5 sort --natural-sort --memory-limit $sambambamem --tmpdir $sortbam/$stem --out $sortbam/$stem.sorted.bam --compression-level $sambambacompression --nthreads $sambambathreads $1  &>> $logs/BAM2Fastq_${stem}.log
-    date | awk '{print "Sorting ended at " $0}' >> $logs/BAM2Fastq_${stem}.log
+    echo "Sorting ended at $(date) on $(hostname)" >> $logs/BAM2Fastq_${stem}.log
+
+    # Renew AFS token
+    kinit -R
 
     #Converts in two piped steps, that is: from BAM to an interleaved fastq
     #and then from the interleaved file to two files, one for each paired end.
-    date | awk '{print "Conversion started at " $0}' >> $logs/BAM2Fastq_${stem}.log
+    echo "Conversion started at $(date) on $(hostname)" >> $logs/BAM2Fastq_${stem}.log
     /oplashare/data/mfalchi/bbmap/reformat.sh in=$sortbam/$stem.sorted.bam out=stdout.fq primaryonly | /oplashare/data/mfalchi/bbmap/reformat.sh in=stdin.fq out1=$eos/fastq/$stem.R1.fq.gz out2=$eos/fastq/$stem.R2.fq.gz interleaved addcolon ow &>> $logs/BAM2Fastq_${stem}.log
-    date | awk '{print "Conversion ended at " $0}' >> $logs/BAM2Fastq_${stem}.log
+    echo "Conversion ended at $(date) on $(hostname)" >> $logs/BAM2Fastq_${stem}.log
 
     #Removing temporary directory
     rm -rf $sortbam/$stem
