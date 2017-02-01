@@ -1,0 +1,9 @@
+For each <machine> in the CERNmachine_list.txt file do:
+   - ssh mfalchi@<machine>
+   - cdshare          # not a typo, it is an alias
+   - Run the RUN_FASTQ.sh command:
+        ./RUN_FASTQ.sh
+   - To see if the processes run use:
+        ./PS.sh
+   - In case you want/need to terminate the run do:
+        ./KILL.sh
