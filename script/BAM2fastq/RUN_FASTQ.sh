@@ -11,7 +11,7 @@ if [ "x$node" == "x" ]; then
 fi
 time=`date "+%Y%m%d%H%M"`
 
-echo "nohup sh ./run_bamToFastq.sh $node &> /eos/genome/local/14007a/logs/log_machine${node}_${time}.log &"
-nohup sh ./run_bamToFastq.sh $node &> /eos/genome/local/14007a/logs/log_machine${node}_${time}.log &
+echo "$ nohup ./run_bamToFastq.sh $node &> /eos/genome/local/14007a/logs/log_machine${node}_${time}.log &"
+nohup ./run_bamToFastq.sh $node &> /eos/genome/local/14007a/logs/log_machine${node}_${time}.log &
 
 exit 0
