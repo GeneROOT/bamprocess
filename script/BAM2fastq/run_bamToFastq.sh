@@ -62,36 +62,37 @@ export -f BAM2Fastq
 availablemachines=6
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# Sets commands paramentes
+# Sets command parameters
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 njobs=2
-sambambamem="32G"; export sambambamem
-sambambathreads=16; export sambambathreads
-sambambacompression=6; export sambambacompression 
+export sambambamem="32G"
+export sambambathreads=16
+export sambambacompression=6
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Sets file's paths
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-filelist="$origbam/allBAM.txt"
-donelist="$origbam/doneBAM.txt"
-todolist="$origbam/todoBAM.txt"
-mylist="$origbam/todoBAM$1.txt"
+allbams="$origbam/allBAM.txt"
+donebams="$origbam/doneBAM.txt"
+todobams="$origbam/todoBAM.txt"
+mybams="$origbam/todoBAM$1.txt"
+mydonebams="$origbam/doneBAM$1.txt"
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Selects files to process 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 #Removing already processed files from the list of file to process
-grep -vwFf $donelist $filelist > $todolist
+grep -vwFf $donebams $allbams > $todobams
 
 #Each machine will process a fair share of the work. 
-awk -v machine=$1 -v availablemachines=$availablemachines 'NR%availablemachines == machine' $todolist > $mylist
+awk -v machine=$1 -v availablemachines=$availablemachines 'NR%availablemachines == machine' $todobams > $mybams
 
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Files are processed 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-/oplashare/data/mfalchi/parallel-20161122/src/parallel --keep-order --jobs $njobs BAM2Fastq :::: $mylist >> $donelist
+/oplashare/data/mfalchi/parallel-20161122/src/parallel --keep-order --jobs $njobs BAM2Fastq :::: $mybams >> $mydonebams
