@@ -11,6 +11,8 @@
 # if not there was an error.
 # In all error cases the files in error will be removed so they can be reprocessed.
 # All files passing the above criteria are added to the doneBAM.txt file.
+#
+# Author: Fons Rademakers, 4/2/2017.
 
 # after relocation, change only eos variable
 eos=/eos/genome/local/14007a
@@ -29,10 +31,12 @@ rm -f $donebam
 # Only when option --delete is set delete the files
 action="echo"
 actionr="echo"
-if [ $# -eq 1 ]; then
+if [ $# -ge 1 ]; then
    if [ "x$1" == "x--delete" ]; then
       action="rm -f" 
       actionr="rm -rf"
+   else
+      echo "Usage: $0 [--delete]"
    fi
 fi
 
@@ -50,11 +54,11 @@ for bam in `cat $allbam`; do
    r2=$fbam/$id.R2.fq.gz
 
    # get size of original BAM file
-   osize=`ls -l $bam | awk '{ print $5 }'`
+   osize=$(ls -l $bam | awk '{ print $5 }')
 
    # check if sorted BAM file exists and get its size
    if [ -f $sb ]; then
-      ssize=`ls -l $sb | awk '{ print $5 }'`
+      ssize=$(ls -l $sb | awk '{ print $5 }')
 
       # if sorted size is less than original size, file is truncated
       if [ $ssize -lt $osize ]; then
@@ -71,11 +75,11 @@ for bam in `cat $allbam`; do
       # check if forward and reverse fastq files exist
       if [ -f $r1 -a -f $r2 ]; then
          # if both files exist check size, they should be close
-         sr1=`ls -l $r1 | awk '{ print $5 }'`
-         sr2=`ls -l $r2 | awk '{ print $5 }'`
+         sr1=$(ls -l $r1 | awk '{ print $5 }')
+         sr2=$(ls -l $r2 | awk '{ print $5 }')
          # fastq file difference greater than 5%, discard files
-         rdiff=`echo "sr1=$sr1;if (sr1==0) sr1=1; x=(sr1-$sr2)/sr1*100; if (x<0) x=-x; print x" | bc -l`
-         rt=`echo "if ($rdiff>5.) print 1 else print 0" | bc -l`
+         rdiff=$(bc -l <<< "sr1=$sr1;if (sr1==0) sr1=1; x=(sr1-$sr2)/sr1*100; if (x<0) x=-x; print x")
+         rt=$(bc -l <<< "if ($rdiff>5.) print 1 else print 0")
          if [ $rt -eq 1 ]; then
             echo "difference between $r1 and $r2 more than 5% ($rdiff), skipping..." 
             $action $r1
@@ -83,8 +87,8 @@ for bam in `cat $allbam`; do
             continue
          fi
          # total fastq files difference with original BAM more than 20%, discard files
-         odiff=`echo "x=($osize-($sr1+$sr2))/$osize*100; if (x<0) x=-x; print x" | bc -l`
-         ot=`echo "if ($odiff>20.) print 1 else print 0" | bc -l`
+         odiff=$(bc -l <<< "x=($osize-($sr1+$sr2))/$osize*100; if (x<0) x=-x; print x")
+         ot=$(bc -l <<< "if ($odiff>20.) print 1 else print 0")
          if [ $ot -eq 1 ]; then
             echo "difference between $r1+$r2 and $bam more than 20% ($odiff), skipping..." 
             $action $r1
@@ -104,7 +108,5 @@ for bam in `cat $allbam`; do
       fi
    fi
 done
-
-# ls -l ../original_BAM/9662.bam | awk '{print int($5/2)}'
 
 exit 0
