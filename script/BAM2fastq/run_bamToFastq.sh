@@ -59,7 +59,7 @@ export -f BAM2Fastq
 #Number of machine I can use to parallelise my job. 
 #The $1 paramenter of this script will identify the current machine 
 #(ranging from 0 to availablemachines-1)
-availablemachines=6
+availablemachines=5
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Sets command parameters
