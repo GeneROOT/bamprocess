@@ -37,6 +37,7 @@ if [ $# -ge 1 ]; then
       actionr="rm -rf"
    else
       echo "Usage: $0 [--delete]"
+      exit 1
    fi
 fi
 
