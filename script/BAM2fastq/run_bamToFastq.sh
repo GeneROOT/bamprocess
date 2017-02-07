@@ -21,11 +21,11 @@ BAM2Fastq()
     # Renew AFS token
     kinit -R
 
-    #Clean up file name
-    fname="${1//[$'\t\r\n']}"
-
     #Extracts ID from filename
     stem=$(basename $fname .bam)
+
+    # Remove old log file
+    rm -f $logs/BAM2Fastq_${stem}.log
     
     #Creates temporary directory for this analysis
     mkdir -p $sortbam/$stem
