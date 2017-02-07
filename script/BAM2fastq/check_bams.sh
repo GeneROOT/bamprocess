@@ -2,14 +2,15 @@
 #
 # This script checks the status of the produced files in the BAM reprocessing.
 #
-# From the original BAM a sorted.BAM is procuced. This BAM is larger than the
-# original, if not then there was an error in creating it.
+# From the original BAM a sorted.BAM is procuced. This BAM must be within 25%
+# of the original, if not then there was an error in creating it.
 # From the sorted.BAM forward and reverse fastq files are produced.
 # Both files must exist and must have a size within 5% (?) of each other,
 # if not there was an error.
 # The size of both fastq files must be within 20% (?) of the original BAM file.
 # if not there was an error.
-# In all error cases the files in error will be removed so they can be reprocessed.
+# In all error cases the files in error will be removed so they can be
+# reprocessed.
 # All files passing the above criteria are added to the doneBAM.txt file.
 #
 # Author: Fons Rademakers, 4/2/2017.
@@ -61,10 +62,11 @@ for bam in `cat $allbam`; do
    if [ -f $sb ]; then
       ssize=$(ls -l $sb | awk '{ print $5 }')
 
-      # if sorted size is less than original size, file is truncated
-      if [ $ssize -lt $osize ]; then
-         echo "sorted truncated: $sb ($ssize) < $bam ($osize), skipping..."
-
+      # if sorted and original file differ by more than 20%, file is truncated
+      sdiff=$(bc -l <<< "x=($osize-$ssize)/$osize*100; if (x<0) x=-x; print x")
+      st=$(bc -l <<< "if ($sdiff>25.) print 1 else print 0")
+      if [ $st -eq 1 ]; then
+         echo "difference between $sb and $bam more than 25% ($sdiff), skipping..." 
          # remove its aretefacts, we have to reprocess the file
          $actionr $sbam/$id
          $action $sb
