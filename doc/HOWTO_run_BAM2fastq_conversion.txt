@@ -7,3 +7,16 @@ For each <machine> in the CERNmachine_list.txt file do:
         ./PS.sh
    - In case you want/need to terminate the run do:
         ./KILL.sh
+
+OR 
+
+For each machine in the CERNmachine_list.txt file with number in [0,3]:
+	ssh the machine
+	access the folder /oplashare/data/mfalchi/GeneROOT/script/BAM2fastq
+	run the run_bamToFastq.sh script using the following command:
+		nohup sh ./run_bamToFastq.sh N &> /eos/genome/local/14007a/logs/log_machineN_YYYYMMDDhhmm.log & 
+	where N is the machine number YYYYMMDDhhdd is the date and time of the execution 
+	(e.g., 201612071052)
+
+
+
