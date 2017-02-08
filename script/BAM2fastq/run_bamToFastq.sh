@@ -21,6 +21,8 @@ BAM2Fastq()
     # Renew AFS token
     kinit -R
 
+    fname=$1
+
     #Extracts ID from filename
     stem=$(basename $fname .bam)
 
