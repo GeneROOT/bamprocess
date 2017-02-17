@@ -1,0 +1,9 @@
+For each machine in the CERNmachine_list.txt file with number in [0,5]:
+	ssh the machine
+	run the run_align.sh script using the following command:
+		nohup sh /oplashare/data/mfalchi/GeneROOT/bamprocess/script/align/run_align.sh N Njobs &> /eos/genome/local/14007a/logs2/log_machineN_YYYYMMDDhhmm.log & 
+	where N is the machine number, Njobs is the number of jobs (2 for all but opladev47.cern.ch, 
+	where we can run 8) and YYYYMMDDhhdd is the date and time of the execution 
+	(e.g., 201612071052)
+
+
