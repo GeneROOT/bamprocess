@@ -59,14 +59,14 @@ export threads=4
 allfastq="$fastq/myTwins.txt"
 donefastq="$fastq/doneTwins.txt"
 todofastq="$fastq/todoTwins.txt"
-myfastq="$origbam/myTwins$1.txt"
+myfastq="$fastq/myTwins$1.txt"
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Selects files to process 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 #Removing already processed files from the list of file to process
-grep -vwFf $donefastq $allfastq > todofastq
+grep -vwFf $donefastq $allfastq > $todofastq
 
 #Each machine will process a fair share of the work. 
 awk -v machine=$1 -v availablemachines=$availablemachines 'NR%availablemachines == machine' $todofastq > $myfastq
