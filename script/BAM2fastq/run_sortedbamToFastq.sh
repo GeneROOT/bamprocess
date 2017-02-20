@@ -26,14 +26,13 @@ sortedBAM2Fastq()
     #Extracts ID from filename
     stem=$(basename $fname .bam)
 
-	echo "" >> $logs/BAM2Fastq_${stem}.log
-	echo "Attempting reformat at $(date) on $(hostname)" > $logs/BAM2Fastq_${stem}.log
-	echo "" >> $logs/BAM2Fastq_${stem}.log
+    echo "" >> $logs/BAM2Fastq_${stem}.log
+    echo "Attempting reformat at $(date) on $(hostname)" >> $logs/BAM2Fastq_${stem}.log
+    echo "" >> $logs/BAM2Fastq_${stem}.log
    
-   
-   	echo "Removing corrupted fastq at $(date) on $(hostname)" > $logs/BAM2Fastq_${stem}.log
-	rm -rf $eos/fastq/$stem.R1.fq.gz $eos/fastq/$stem.R2.fq.gz
-	echo "" >> $logs/BAM2Fastq_${stem}.log
+    echo "Removing corrupted fastq at $(date) on $(hostname)" >> $logs/BAM2Fastq_${stem}.log
+    rm -rf $eos/fastq/$stem.R1.fq.gz $eos/fastq/$stem.R2.fq.gz
+    echo "" >> $logs/BAM2Fastq_${stem}.log
 	
     #Converts in two piped steps, that is: from BAM to an interleaved fastq
     #and then from the interleaved file to two files, one for each paired end.

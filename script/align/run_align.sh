@@ -46,31 +46,32 @@ align()
     kinit -R
 
     stem=$1
-	echo $stem
+    echo $stem
 
-	echo "" >> $logs/speedseq_${stem}.log  
-	echo "Starting alignment at $(date) on $(hostname)" > $logs/speedseq_${stem}.log  
-	echo "" >> $logs/speedseq_${stem}.log  
+    echo "" >> $logs/speedseq_${stem}.log  
+    echo "Starting alignment at $(date) on $(hostname)" > $logs/speedseq_${stem}.log  
+    echo "" >> $logs/speedseq_${stem}.log  
    
-	# Runs speedseq align
+    # Runs speedseq align
     /oplashare/data/mfalchi/speedseq/bin/speedseq align -M $mem -v -t $threads -T /data/mfalchi/${stem}_tmp_dir -R "@RG\tID:id\tSM:$stem\tLB:lib" -o $newbam/ $eos/reference/human_g1k_v37.fasta.gz $fastq/$stem.R1.fq.gz $fastq/$stem.R2.fq.gz  &> $logs/speedseq_${stem}.log  
 
     # Renew AFS token
     kinit -R
 
-	echo "" >> $logs/speedseq_${stem}.log  
-	echo "Alignment completed at $(date) on $(hostname)" > $logs/speedseq_${stem}.log  
-	echo "" >> $logs/speedseq_${stem}.log  
+    echo "" >> $logs/speedseq_${stem}.log  
+    echo "Alignment completed at $(date) on $(hostname)" > $logs/speedseq_${stem}.log  
+    echo "" >> $logs/speedseq_${stem}.log  
    
-	echo "" >> $logs/speedseq_${stem}.log  
-	echo "Removing /data/mfalchi/${stem}_tmp_dir/" > $logs/speedseq_${stem}.log    
+    echo "" >> $logs/speedseq_${stem}.log  
+    echo "Removing /data/mfalchi/${stem}_tmp_dir/" > $logs/speedseq_${stem}.log    
 
-	#Cleans local directory (EOS does not support pipes)
-	rm -rf /data/mfalchi/${stem}_tmp_dir/
-	echo "   Done ${stem}" > $logs/speedseq_${stem}.log    
+    #Cleans local directory (EOS does not support pipes)
+    rm -rf /data/mfalchi/${stem}_tmp_dir/
+    echo "   Done ${stem}" > $logs/speedseq_${stem}.log    
 	
 }
 export -f align
+
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Selects files to process 
