@@ -48,7 +48,7 @@ align()
     stem=$1
     echo $stem
 
-    echo "" >> $logs/speedseq_${stem}.log  
+    echo "" > $logs/speedseq_${stem}.log  
     echo "Starting alignment at $(date) on $(hostname)" > $logs/speedseq_${stem}.log  
     echo "" >> $logs/speedseq_${stem}.log  
    
