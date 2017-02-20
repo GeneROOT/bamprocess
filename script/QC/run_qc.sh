@@ -19,7 +19,6 @@ availablemachines=5
 # Sets command parameters
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-export mem=32
 export threads=4
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -31,7 +30,7 @@ export fastq="$eos/fastq"
 export qc="$eos/fastQC"
 export logs="$eos/logsQC"
 
-allfastq="$fastq/MZ_to_align.txt"
+allfastq="$fastq/MZ_to_QC.txt"
 donefastq="$fastq/doneQC.txt"
 todofastq="$fastq/todoQCTwins.txt"
 myfastq="$fastq/myTwinsQC$1.txt"
@@ -65,16 +64,16 @@ qualityassessment()
    
     # Runs fastqc align
     /oplashare/data/mfalchi/FastQC/fastqc --quiet --noextract --format fastq --threads $threads --outdir=$qc/ $fastq/${stem}.R1.fq.gz &>> $logs/fastqc_${stem}.log  
-	extractQCinfo $qc $stem.R1.fq $stem.R1.fq
+	extractQCinfo $qc $stem.R1.fq $stem.R1
 	
     # Renew AFS token
     kinit -R
 	
     /oplashare/data/mfalchi/FastQC/fastqc --quiet --noextract --format fastq --threads $threads --outdir=$eos/fastQC/ $fastq/${stem}.R2.fq.gz  &>> $logs/fastqc_${stem}.log
-	extractQCinfo $qc $stem.R2.fq $stem.R2.fq
+	extractQCinfo $qc $stem.R2.fq $stem.R2
 	    
     echo "" >> $logs/fastqc_${stem}.log  
-    echo "fastQC ended at $(date) on $(hostname)" > $logs/fastqc_${stem}.log  
+    echo "fastQC ended at $(date) on $(hostname)" >> $logs/fastqc_${stem}.log  
     echo "" >> $logs/fastqc_${stem}.log  
 }
 export -f qualityassessment
