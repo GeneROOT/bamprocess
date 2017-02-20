@@ -6,35 +6,6 @@
 
 PATH=/oplashare/data/mfalchi/samtools-1.3.1:/oplashare/data/mfalchi/pigz-2.3.4:$PATH
 
-# Paths
-export eos="/eos/genome/local/14007a"
-export fastq="$eos/fastq"
-export newbam="$eos/realigned_BAM"
-export logs="$eos/logs2"
-
-#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# Defines function coding for the conversion pipeline
-#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-align() 
-{
-    # Renew AFS token
-    kinit -R
-
-    stem=$1
-
-	# Runs speedseq align
-    /oplashare/data/mfalchi/speedseq/bin/speedseq align -M $mem -v -t $threads -T /data/mfalchi/${stem}_tmp_dir -R "@RG\tID:id\tSM:$stem\tLB:lib" -o $newbam/ /eos/genome/local/14007a/reference/human_g1k_v37.fasta.gz /eos/genome/local/14007a/fastq/$stem.R1.fq.gz /eos/genome/local/14007a/fastq/$stem.R2.fq.gz  &> /eos/genome/local/14007a/tests/speedseq_${stem}.log  
-
-    # Renew AFS token
-    kinit -R
-	
-	mv /data/mfalchi/${stem}_tmp_dir/${stem}* 
-	#Cleans local directory (EOS does not support pipes)
-	rm -rf /data/mfalchi/${stem}_tmp_dir/
-}
-export -f align
-
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Sets general parameters
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -48,18 +19,58 @@ availablemachines=6
 # Sets command parameters
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-njobs=$2
-export mem="32G"
+export mem=32
 export threads=4
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Sets file's paths
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-allfastq="$fastq/myTwins.txt"
+export eos="/eos/genome/local/14007a"
+export fastq="$eos/fastq"
+export newbam="$eos/realigned_BAM"
+export logs="$eos/logs2"
+
+allfastq="$fastq/MZ_to_align.txt"
 donefastq="$fastq/doneTwins.txt"
 todofastq="$fastq/todoTwins.txt"
 myfastq="$fastq/myTwins$1.txt"
+
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# Defines function coding for the conversion pipeline
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+align() 
+{
+    # Renew AFS token
+    kinit -R
+
+    stem=$1
+	echo $stem
+
+	echo "" >> $logs/speedseq_${stem}.log  
+	echo "Starting alignment at $(date) on $(hostname)" > $logs/speedseq_${stem}.log  
+	echo "" >> $logs/speedseq_${stem}.log  
+   
+	# Runs speedseq align
+    /oplashare/data/mfalchi/speedseq/bin/speedseq align -M $mem -v -t $threads -T /data/mfalchi/${stem}_tmp_dir -R "@RG\tID:id\tSM:$stem\tLB:lib" -o $newbam/ $eos/reference/human_g1k_v37.fasta.gz $fastq/$stem.R1.fq.gz $fastq/$stem.R2.fq.gz  &> $logs/speedseq_${stem}.log  
+
+    # Renew AFS token
+    kinit -R
+
+	echo "" >> $logs/speedseq_${stem}.log  
+	echo "Alignment completed at $(date) on $(hostname)" > $logs/speedseq_${stem}.log  
+	echo "" >> $logs/speedseq_${stem}.log  
+   
+	echo "" >> $logs/speedseq_${stem}.log  
+	echo "Removing /data/mfalchi/${stem}_tmp_dir/" > $logs/speedseq_${stem}.log    
+
+	#Cleans local directory (EOS does not support pipes)
+	rm -rf /data/mfalchi/${stem}_tmp_dir/
+	echo "   Done ${stem}" > $logs/speedseq_${stem}.log    
+	
+}
+export -f align
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Selects files to process 
@@ -71,9 +82,8 @@ grep -vwFf $donefastq $allfastq > $todofastq
 #Each machine will process a fair share of the work. 
 awk -v machine=$1 -v availablemachines=$availablemachines 'NR%availablemachines == machine' $todofastq > $myfastq
 
-
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Files are processed 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-/oplashare/data/mfalchi/parallel-20161122/src/parallel --keep-order --jobs $njobs align :::: $myfastq 
+/oplashare/data/mfalchi/parallel-20161122/src/parallel --keep-order --jobs $2 align :::: $myfastq 
