@@ -45,7 +45,7 @@ extractQCinfo()
 #$2 is the stem for the new files
 {
 	#Renames HTML file, extracts QC summary and removes archive
-	mv $1/${2}_fastqc.html $1/$3_fastqc.html
+	# mv $1/${2}_fastqc.html $1/$3_fastqc.html
 	unzip -p $1/${2}_fastqc.zip ${2}_fastqc/fastqc_data.txt > $1/${3}_fastqc_data.txt  
 	# rm -rf $1/${2}_fastqc.zip
 }
@@ -63,13 +63,13 @@ qualityassessment()
     echo "" >> $logs/fastqc_${stem}.log  
    
     # Runs fastqc align
-    /oplashare/data/mfalchi/FastQC/fastqc --quiet --noextract --format fastq --threads $threads --outdir=$qc/ $fastq/${stem}.R1.fq.gz &>> $logs/fastqc_${stem}.log  
+    /oplashare/data/mfalchi/FastQC/fastqc --quiet --noextract --format fastq --threads $threads --outdir=$qc $fastq/${stem}.R1.fq.gz &>> $logs/fastqc_${stem}.log  
 	extractQCinfo $qc $stem.R1.fq $stem.R1
 	
     # Renew AFS token
     kinit -R
 	
-    /oplashare/data/mfalchi/FastQC/fastqc --quiet --noextract --format fastq --threads $threads --outdir=$eos/fastQC/ $fastq/${stem}.R2.fq.gz  &>> $logs/fastqc_${stem}.log
+    /oplashare/data/mfalchi/FastQC/fastqc --quiet --noextract --format fastq --threads $threads --outdir=$qc $fastq/${stem}.R2.fq.gz  &>> $logs/fastqc_${stem}.log
 	extractQCinfo $qc $stem.R2.fq $stem.R2
 	    
     echo "" >> $logs/fastqc_${stem}.log  
