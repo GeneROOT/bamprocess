@@ -8,5 +8,7 @@ echo "$ pgrep -af \"perl /oplashare/data/mfalchi/parallel\""
 pgrep -af "perl /oplashare/data/mfalchi/parallel"
 echo "$ pgrep -a sambamba_v0.6.5"
 pgrep -a sambamba_v0.6.5
+echo "$ pgrep -af \"java.*/oplashare/data/mfalchi/bbmap/current/\""
+pgrep -af "java.*/oplashare/data/mfalchi/bbmap/current/"
 
 exit 0
