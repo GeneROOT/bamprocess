@@ -30,6 +30,7 @@ export eos="/eos/genome/local/14007a"
 export fastq="$eos/fastq"
 export newbam="$eos/realigned_BAM"
 export logs="$eos/logs2"
+export local="/data/mfalchi"
 
 allfastq="$fastq/MZ_to_align.txt"
 donefastq="$fastq/doneTwins.txt"
@@ -53,20 +54,27 @@ align()
     echo "" >> $logs/speedseq_${stem}.log  
    
     # Runs speedseq align
-    /oplashare/data/mfalchi/speedseq/bin/speedseq align -M $mem -v -t $threads -T /data/mfalchi/${stem}_tmp_dir -R "@RG\tID:id\tSM:$stem\tLB:lib" -o $newbam/${stem} $eos/reference/human_g1k_v37.fasta.gz $fastq/$stem.R1.fq.gz $fastq/$stem.R2.fq.gz  &>> $logs/speedseq_${stem}.log  
+    /oplashare/data/mfalchi/speedseq/bin/speedseq align -M $mem -v -t $threads -T $local/${stem}_tmp_dir -R "@RG\tID:id\tSM:$stem\tLB:lib" -o $local/${stem} $eos/reference/human_g1k_v37.fasta.gz $fastq/$stem.R1.fq.gz $fastq/$stem.R2.fq.gz  &>> $logs/speedseq_${stem}.log  
 
     # Renew AFS token
     kinit -R
+
+    # copy output to newbam
+    echo "" >> $logs/speedseq_${stem}.log  
+    echo "Copying output $local/$stem to $newbam/${stem}" >> $logs/speedseq_${stem}.log  
+    echo "" >> $logs/speedseq_${stem}.log  
+    eos cp $local/$stem $newbam/${stem}
+    rm -f $local/$stem
 
     echo "" >> $logs/speedseq_${stem}.log  
     echo "Alignment completed at $(date) on $(hostname)" >> $logs/speedseq_${stem}.log  
     echo "" >> $logs/speedseq_${stem}.log  
    
     echo "" >> $logs/speedseq_${stem}.log  
-    echo "Removing /data/mfalchi/${stem}_tmp_dir/" >> $logs/speedseq_${stem}.log    
+    echo "Removing $local/${stem}_tmp_dir/" >> $logs/speedseq_${stem}.log    
 
     #Cleans local directory (EOS does not support pipes)
-    mv /data/mfalchi/${stem}_tmp_dir/  /data/mfalchi/${stem}_tmp_dir_done/
+    mv $local/${stem}_tmp_dir/  $local/${stem}_tmp_dir_done/
     echo "   Done ${stem}" >> $logs/speedseq_${stem}.log    
 	
 }
