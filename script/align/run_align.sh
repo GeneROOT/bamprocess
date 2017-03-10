@@ -63,7 +63,7 @@ align()
     echo "" >> $logs/speedseq_${stem}.log  
     echo "Copying output $local/$stem to $newbam/${stem}" >> $logs/speedseq_${stem}.log  
     echo "" >> $logs/speedseq_${stem}.log  
-    eos cp --checksum $local/$stem* $newbam/${stem}*
+    eos cp --checksum $local/$stem.* $newbam/${stem}.*
     rm -f $local/$stem
 
     echo "" >> $logs/speedseq_${stem}.log  
