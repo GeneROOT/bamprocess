@@ -63,8 +63,8 @@ align()
     echo "" >> $logs/speedseq_${stem}.log  
     echo "Copying output $local/$stem to $newbam/${stem}" >> $logs/speedseq_${stem}.log  
     echo "" >> $logs/speedseq_${stem}.log  
-    eos cp --checksum $local/$stem.* $newbam/${stem}.*
-    rm -f $local/$stem
+    eos cp --checksum $local/$stem.* root://eosgenome.cern.ch/$newbam/
+    rm -f $local/$stem.*
 
     echo "" >> $logs/speedseq_${stem}.log  
     echo "Alignment completed at $(date) on $(hostname)" >> $logs/speedseq_${stem}.log  
