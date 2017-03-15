@@ -58,7 +58,7 @@ align()
     echo "" >> $logs/speedseq_${stem}.log  
    
     # Runs speedseq align
-    /oplashare/data/mfalchi/speedseq/bin/speedseq align -M $mem -v -t $threads -T $local/${stem}_tmp_dir -R "@RG\tID:id\tSM:$stem\tLB:lib" -o root://eosgenome.cern.ch/$newbam/ $eos/reference/human_g1k_v37.fasta.gz $fastq/$stem.R1.fq.gz $fastq/$stem.R2.fq.gz  &>> $logs/speedseq_${stem}.log  
+    /oplashare/data/mfalchi/speedseq/bin/speedseq align -M $mem -v -t $threads -T $local/${stem}_tmp_dir -R "@RG\tID:id\tSM:$stem\tLB:lib" -o $newbam/$stem/ $eos/reference/human_g1k_v37.fasta.gz $fastq/$stem.R1.fq.gz $fastq/$stem.R2.fq.gz  &>> $logs/speedseq_${stem}.log  
 
     # Renew AFS token
     kinit -R
