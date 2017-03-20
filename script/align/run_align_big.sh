@@ -80,7 +80,7 @@ align()
     #Cleans local directory (EOS does not support pipes)
 
     # Remove tmp_dir_done once we check the logs so that we get some space free
-    mv $local/${stem}_tmp_dir/  $local/${stem}_tmp_dir_done/
+    rm -f $local/${stem}_tmp_dir/
     echo "   Done ${stem}" >> $logs/speedseq_${stem}.log    
 	
 }
