@@ -13,7 +13,7 @@ PATH=/oplashare/data/mfalchi/samtools-1.3.1:/oplashare/data/mfalchi/pigz-2.3.4:$
 #Number of machine I can use to parallelise my job. 
 #The $1 paramenter of this script will identify the current machine 
 #(ranging from 0 to availablemachines-1)
-availablemachines=5
+availablemachines=4
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Sets command parameters
@@ -33,7 +33,7 @@ export logs="$eos/logs2"
 export local="/data/mfalchi"
 
 allfastq="$fastq/MZ_to_align.txt"
-donefastq="$fastq/doneTwins.txt"
+donefastq="$fastq/doneTwins3.txt"
 todofastq="$fastq/todoTwins.txt"
 myfastq="$fastq/myTwins$1.txt"
 
@@ -54,17 +54,17 @@ align()
     echo "" >> $logs/speedseq_${stem}.log  
    
     # Runs speedseq align
-    /oplashare/data/mfalchi/speedseq/bin/speedseq align -M $mem -v -t $threads -T $local/${stem}_tmp_dir -R "@RG\tID:id\tSM:$stem\tLB:lib" -o $local/${stem} $eos/reference/human_g1k_v37.fasta.gz $fastq/$stem.R1.fq.gz $fastq/$stem.R2.fq.gz  &>> $logs/speedseq_${stem}.log  
+    /oplashare/data/mfalchi/speedseq/bin/speedseq align -M $mem -v -t $threads -T $local/${stem}_tmp_dir -R "@RG\tID:id\tSM:$stem\tLB:lib" -o $newbam/${stem} $eos/reference/human_g1k_v37.fasta.gz $fastq/$stem.R1.fq.gz $fastq/$stem.R2.fq.gz  &>> $logs/speedseq_${stem}.log  
 
     # Renew AFS token
     kinit -R
 
     # copy output to newbam
-    echo "" >> $logs/speedseq_${stem}.log  
-    echo "Copying output $local/$stem to $newbam/${stem}" >> $logs/speedseq_${stem}.log  
-    echo "" >> $logs/speedseq_${stem}.log  
-    eos cp --checksum $local/$stem.* root://eosgenome.cern.ch/$newbam/
-    rm -f $local/$stem.*
+    # echo "" >> $logs/speedseq_${stem}.log  
+    # echo "Copying output $local/$stem to $newbam/${stem}" >> $logs/speedseq_${stem}.log  
+    # echo "" >> $logs/speedseq_${stem}.log  
+    # eos cp --checksum $local/$stem.* root://eosgenome.cern.ch/$newbam/
+    # rm -f $local/$stem.*
 
     echo "" >> $logs/speedseq_${stem}.log  
     echo "Alignment completed at $(date) on $(hostname)" >> $logs/speedseq_${stem}.log  
@@ -74,7 +74,7 @@ align()
     echo "Removing $local/${stem}_tmp_dir/" >> $logs/speedseq_${stem}.log    
 
     #Cleans local directory (EOS does not support pipes)
-    mv $local/${stem}_tmp_dir/  $local/${stem}_tmp_dir_done/
+    rm -f $local/${stem}_tmp_dir/
     echo "   Done ${stem}" >> $logs/speedseq_${stem}.log    
 	
 }
