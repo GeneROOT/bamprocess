@@ -17,7 +17,7 @@ PATH=/oplashare/data/mfalchi/samtools-1.3.1:/oplashare/data/mfalchi/pigz-2.3.4:$
 #Number of machine I can use to parallelise my job. 
 #The $1 paramenter of this script will identify the current machine 
 #(ranging from 0 to availablemachines-1)
-availablemachines=5
+availablemachines=1
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Sets command parameters
@@ -37,9 +37,10 @@ export logs="$eos/logs2"
 export local="/data/mfalchi"
 
 allfastq="$fastq/MZ_to_align.txt"
-donefastq="$fastq/doneTwins.txt"
+donefastq="$fastq/doneTwins2.txt"
 todofastq="$fastq/todoTwins.txt"
 myfastq="$fastq/myTwins$1.txt"
+
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Defines function coding for the conversion pipeline
